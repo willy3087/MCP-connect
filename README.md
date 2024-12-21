@@ -59,31 +59,103 @@ Note:
 - The bridge is designed to be run on a local machine, so you still need to build a tunnel to the local MCP server that is accessible from the cloud.
 - Ngrok, Cloudflare Zero Trust, and LocalTunnel are recommended for building the tunnel.
 
+## API Endpoints
+
+After the bridge is running, there are two endpoints exposed:
+
+- `GET /health`: Health check endpoint
+- `POST /bridge`: Main bridge endpoint for receiving requests from the cloud
+
+For example, the following is a configuration of the official [Github MCP](https://github.com/modelcontextprotocol/servers/tree/main/src/github):
+
+```json
+{
+  "command": "npx",
+  "args": [
+    "-y",
+    "@modelcontextprotocol/server-github"
+  ],
+  "env": {
+    "GITHUB_PERSONAL_ACCESS_TOKEN": "<your_github_personal_access_token>"
+  }
+}
+```
+
+You can send a request to the bridge as the following to list the tools of the MCP server and call a specific tool.
+
+**Listing tools:**
+
+```bash
+curl -X POST http://localhost:3000/bridge \
+     -d '{
+       "method": "tools/list",
+       "serverPath": "npx",
+       "args": [
+         "-y",
+         "@modelcontextprotocol/server-github"
+       ],
+       "params": {},
+       "env": {
+         "GITHUB_PERSONAL_ACCESS_TOKEN": "<your_github_personal_access_token>"
+       }
+     }'
+```
+
+**Calling a tool:**
+
+Using the search_repositories tool to search for repositories related to modelcontextprotocol
+
+```bash
+curl -X POST http://localhost:3000/bridge \
+     -d '{
+       "method": "tools/call",
+       "serverPath": "npx",
+       "args": [
+         "-y",
+         "@modelcontextprotocol/server-github"
+       ],
+       "params": {
+         "name": "search_repositories",
+         "arguments": {
+            "query": "modelcontextprotocol"
+         },
+       },
+       "env": {
+         "GITHUB_PERSONAL_ACCESS_TOKEN": "<your_github_personal_access_token>"
+       }
+     }'
+```
+
+## Authentication
+
+The bridge uses a simple token-based authentication system. The token is stored in the `.env` file. If the token is set, the bridge will use it to authenticate the request.
+
+Sample request with token:
+
+```bash
+curl -X POST http://localhost:3000/bridge \
+     -H "Authorization: Bearer <your_auth_token>" \
+     -d '{
+       "method": "tools/list",
+       "serverPath": "npx",
+       "args": [
+         "-y",
+         "@modelcontextprotocol/server-github"
+       ],
+       "params": {},
+       "env": {
+         "GITHUB_PERSONAL_ACCESS_TOKEN": "<your_github_personal_access_token>"
+       }
+     }'
+```
+
 ## Configuration
 
 Required environment variables:
 
-- `AUTH_TOKEN`: Authentication token for the bridge API
-- `PORT`: HTTP server port (default: 3000)
-- `LOG_LEVEL`: Logging level (default: info)
-
-## Usage
-
-Development mode:
-```bash
-npm run dev
-```
-
-Production mode:
-```bash
-npm run build
-npm start
-```
-
-## API Endpoints
-
-- `GET /health`: Health check endpoint
-- `POST /bridge`: Main bridge endpoint for cloud integration
+- `AUTH_TOKEN`: Authentication token for the bridge API (Optional)
+- `PORT`: HTTP server port (default: 3000, required)
+- `LOG_LEVEL`: Logging level (default: info, required)
 
 ## License
 
