@@ -36,6 +36,13 @@ By bridging this gap, we can leverage the full potential of local MCP tools in c
 ## Installation
 
 1. Clone the repository
+   ```bash
+   git clone https://github.com/modelcontextprotocol/mcp-bridge.git
+   ```
+   and enter the directory
+   ```bash
+   cd mcp-bridge
+   ```
 2. Copy `.env.example` to `.env` and configure the port and auth_token:
    ```bash
    cp .env.example .env
