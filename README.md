@@ -1,6 +1,13 @@
 # MCP Bridge
 
-The Model Context Protocol (MCP) introduced by Anthropic is very powerful. However, most MCP servers are built on Stdio transport, which, while excellent for accessing local resources, limits their use in cloud-based applications.
+    ███╗   ███╗ ██████╗██████╗     ██████╗ ██████╗ ██��██████╗  ██████╗ ███████╗
+    ████╗ ████║██╔════╝██╔══██╗    ██╔══██╗██╔══██╗██║██╔══██╗██╔════╝ ██╔════╝
+    ██╔████╔██║██║     ██████╔╝    ██████╔╝██████╔╝██║██║  ██║██║  ███╗█████╗  
+    ██║╚██╔╝██║██║     ██╔═══╝     ██╔══██╗██╔══██╗██║██║  ██║██║   ██║██╔══╝  
+    ██║ ╚═╝ ██║╚██████╗██║         ██████╔╝██║  ██║██║██████╔╝╚██████╔╝███████╗
+    ╚═╝     ╚═╝ ╚═════╝╚═╝         ╚═════╝ ╚═╝  ╚═╝╚═╝╚═════╝  ╚═════╝ ╚══════╝
+
+The Model Context Protocol (MCP) introduced by Anthropic is cool. However, most MCP servers are built on Stdio transport, which, while excellent for accessing local resources, limits their use in cloud-based applications.
 
 MCP bridge is a tiny tool that is created to solve this problem:
 
@@ -11,7 +18,7 @@ MCP bridge is a tiny tool that is created to solve this problem:
 
 By bridging this gap, we can leverage the full potential of local MCP tools in cloud-based AI applications without compromising on security.
 
-## System Architecture
+## How it works
 
 ```
 +-----------------+     HTTPS/SSE      +------------------+      stdio      +------------------+
