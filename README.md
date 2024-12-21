@@ -53,14 +53,14 @@ By bridging this gap, we can leverage the full potential of local MCP tools in c
    ```
 4. Run the bridge
    ```bash
+   # build the bridge
    npm run build
+   # run the bridge
    npm start
-   ```
-5. Run the bridge in dev mode (supports hot reloading by nodemon)
-   ```bash
+   # or, run in dev mode (supports hot reloading by nodemon)
    npm run dev
    ```
-Now MCP bridge is running on `http://localhost:3000`.
+Now MCP bridge should be running on `http://localhost:3000`.
 
 Note:
 - The bridge is designed to be run on a local machine, so you still need to build a tunnel to the local MCP server that is accessible from the cloud.
