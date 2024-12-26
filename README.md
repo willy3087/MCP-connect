@@ -15,6 +15,8 @@ MCP bridge is a tiny tool that is created to solve this problem:
 - **Protocol Translation**: Converts HTTP/HTTPS requests to Stdio communication
 - **Security**: Provides secure access to local resources while maintaining control
 - **Flexibility**: Supports various MCP servers without modifying their implementation
+- **Easy to use**: Just run the bridge and the MCP server, zero modification to the MCP server
+- **Tunnel**: Built-in support for Ngrok tunnel
 
 By bridging this gap, we can leverage the full potential of local MCP tools in cloud-based AI applications without compromising on security.
 
@@ -182,6 +184,7 @@ Required environment variables:
 - `AUTH_TOKEN`: Authentication token for the bridge API (Optional)
 - `PORT`: HTTP server port (default: 3000, required)
 - `LOG_LEVEL`: Logging level (default: info, required)
+- `NGROK_AUTH_TOKEN`: Ngrok auth token (Optional)
 
 ## License
 
