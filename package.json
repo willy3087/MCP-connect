@@ -7,7 +7,9 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
+    "start:tunnel": "node dist/index.js --tunnel",
     "dev": "tsc --watch & node --watch dist/index.js",
+    "dev:tunnel": "tsc --watch & node --watch dist/index.js --tunnel",
     "lint": "eslint src/",
     "test": "jest"
   },
@@ -15,6 +17,7 @@
     "@modelcontextprotocol/sdk": "^1.0.3",
     "dotenv": "^16.0.3",
     "express": "^4.19.2",
+    "ngrok": "^5.0.0-beta.2",
     "winston": "^3.8.2"
   },
   "devDependencies": {

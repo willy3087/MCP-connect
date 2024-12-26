@@ -33,7 +33,7 @@ By bridging this gap, we can leverage the full potential of local MCP tools in c
 
 - Node.js
 
-## Installation
+## Quick Start
 
 1. Clone the repository
    ```bash
@@ -56,15 +56,34 @@ By bridging this gap, we can leverage the full potential of local MCP tools in c
    # build the bridge
    npm run build
    # run the bridge
-   npm start
+   npm run start
    # or, run in dev mode (supports hot reloading by nodemon)
    npm run dev
    ```
-Now MCP bridge should be running on `http://localhost:3000`.
+Now MCP bridge should be running on `http://localhost:3000/bridge`.
 
 Note:
 - The bridge is designed to be run on a local machine, so you still need to build a tunnel to the local MCP server that is accessible from the cloud.
 - Ngrok, Cloudflare Zero Trust, and LocalTunnel are recommended for building the tunnel.
+
+## Running with Ngrok Tunnel
+
+MCP bridge has built-in support for Ngrok tunnel. To run the bridge with a public URL using Ngrok:
+
+1. Get your Ngrok auth token from https://dashboard.ngrok.com/authtokens
+2. Add to your .env file:
+   ```
+   NGROK_AUTH_TOKEN=your_ngrok_auth_token
+   ```
+3. Run with tunnel:
+   ```bash
+   # Production mode with tunnel
+   npm run start:tunnel
+   
+   # Development mode with tunnel
+   npm run dev:tunnel
+   ``` 
+After the bridge is running, you can see the MCP Bridge URL in the console.
 
 ## API Endpoints
 

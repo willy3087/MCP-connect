@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { Config } from '../config/config.js';
 import { Logger } from '../utils/logger.js';
 import { MCPClientManager } from '../client/mcp-client-manager.js';
+import { TunnelManager } from '../utils/tunnel.js';
 
 export class HttpServer {
   private app = express();
@@ -9,20 +10,37 @@ export class HttpServer {
   private readonly logger: Logger;
   private readonly mcpClient: MCPClientManager;
   private readonly accessToken: string;
+  private tunnelManager?: TunnelManager;
+  private reconnectTimer: NodeJS.Timeout | null = null;
 
   constructor(config: Config, logger: Logger, mcpClient: MCPClientManager) {
     this.config = config;
     this.logger = logger;
     this.mcpClient = mcpClient;
     
-    // 从环境变量获取 access token
     this.accessToken = process.env.ACCESS_TOKEN || '';
     if (!this.accessToken) {
       this.logger.warn('No ACCESS_TOKEN environment variable set. This is a security risk.');
     }
     
+    if (process.argv.includes('--tunnel')) {
+      this.tunnelManager = new TunnelManager(logger);
+    }
+    
     this.setupMiddleware();
     this.setupRoutes();
+
+    this.setupHeartbeat();
+  }
+
+  private setupHeartbeat() {
+    this.reconnectTimer = setInterval(() => {
+      fetch(`http://localhost:${this.config.server.port}/health`)
+        .catch(error => {
+          this.logger.warn('Health check failed, restarting server...');
+          this.start();
+        });
+    }, 30000); 
   }
 
   private setupMiddleware(): void {
@@ -80,8 +98,6 @@ export class HttpServer {
         const { serverPath, method, params, args, env } = req.body;
 
         this.logger.info('Bridge request received:', req.body);
-        this.logger.info('params', params);
-        this.logger.info('env', env);
         if (!serverPath || !method || !params) {
           res.status(400).json({ 
             error: 'Invalid request body. Required: serverPath, method, params. Optional: args' 
@@ -108,10 +124,10 @@ export class HttpServer {
     });
   }
 
-  public start(): void {
+  public async start(): Promise<void> {
     // ASCII art banner
     const banner = `
-    ███╗   ███╗ ██████╗██████╗     ██████╗ ██████╗ ██��██████╗  ██████╗ ███████╗
+    ███╗   ███╗ ██████╗██████╗     ██████╗ ██████╗ ██║██████╗  ██████╗ ███████╗
     ████╗ ████║██╔════╝██╔══██╗    ██╔══██╗██╔══██╗██║██╔══██╗██╔════╝ ██╔════╝
     ██╔████╔██║██║     ██████╔╝    ██████╔╝██████╔╝██║██║  ██║██║  ███╗█████╗  
     ██║╚██╔╝██║██║     ██╔═══╝     ██╔══██╗██╔══██╗██║██║  ██║██║   ██║██╔══╝  
@@ -119,12 +135,32 @@ export class HttpServer {
     ╚═╝     ╚═╝ ╚═════╝╚═╝         ╚═════╝ ╚═╝  ╚═╝╚═╝╚═════╝  ╚═════╝ ╚══════╝
     `;
     
-    this.app.listen(this.config.server.port, () => {
-        console.log('\x1b[36m%s\x1b[0m', banner);
-        const localUrl = `http://localhost:${this.config.server.port}`;
-        this.logger.info(`Server listening on port ${this.config.server.port}`);
-        this.logger.info(`Local: \x1b]8;;${localUrl}\x1b\\${localUrl}\x1b]8;;\x1b\\`);
-        this.logger.info(`Health check: \x1b]8;;${localUrl}/health\x1b\\${localUrl}/health\x1b]8;;\x1b\\`);
+    this.app.listen(this.config.server.port, async () => {
+      console.log('\x1b[36m%s\x1b[0m', banner);
+      const localUrl = `http://localhost:${this.config.server.port}`;
+      this.logger.info(`Server listening on port ${this.config.server.port}`);
+      this.logger.info(`Local: ${localUrl}`);
+      this.logger.info(`Health check URL: ${localUrl}/health`);
+      this.logger.info(`MCP Bridge URL: ${localUrl}/bridge`);
+
+      if (this.tunnelManager) {
+        this.tunnelManager.createTunnel(this.config.server.port)
+          .then(url => {
+            if (url) {
+              this.logger.info(`Tunnel URL: ${url}`);
+              this.logger.info(`MCP Bridge URL: ${url}/bridge`);
+            }
+          })
+          .catch(error => {
+            this.logger.error('Failed to create tunnel:', error);
+          });
+      }
     });
+  }
+
+  public async stop(): Promise<void> {
+    if (this.tunnelManager) {
+      await this.tunnelManager.disconnect();
+    }
   }
 } 
