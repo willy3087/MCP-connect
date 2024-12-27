@@ -94,7 +94,7 @@ After the bridge is running, there are two endpoints exposed:
 - `GET /health`: Health check endpoint
 - `POST /bridge`: Main bridge endpoint for receiving requests from the cloud
 
-For example, the following is a configuration of the official [Github MCP](https://github.com/modelcontextprotocol/servers/tree/main/src/github):
+For example, the following is a configuration of the official [GitHub MCP](https://github.com/modelcontextprotocol/servers/tree/main/src/github):
 
 ```json
 {
