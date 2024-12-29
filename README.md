@@ -1,4 +1,5 @@
 # MCP Bridge
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
     ███╗   ███╗ ██████╗██████╗     ██████╗ ██████╗ ██║██████╗  ██████╗ ███████╗
     ████╗ ████║██╔════╝██╔══██╗    ██╔══██╗██╔══██╗██║██╔══██╗██╔════╝ ██╔════╝
@@ -188,4 +189,4 @@ Required environment variables:
 
 ## License
 
-MIT 
+MIT License
