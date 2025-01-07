@@ -43,7 +43,7 @@ export class MCPClientManager {
 
   public async createClient(serverPath: string, args?: string[], env?: Record<string, string>): Promise<string> {
     const clientId = `client_${Date.now()}`;
-    
+    this.logger.info(`Creating client ${clientId} for ${serverPath}`);
     try {
       let transport;
       

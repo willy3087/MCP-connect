@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import express, { Request, Response } from 'express';
 import { Config } from '../config/config.js';
 import { Logger } from '../utils/logger.js';
@@ -12,11 +13,19 @@ export class HttpServer {
   private readonly accessToken: string;
   private tunnelManager?: TunnelManager;
   private reconnectTimer: NodeJS.Timeout | null = null;
+  private clientCache: Map<string, {
+    id: string,
+    lastUsed: number,
+    env?: Record<string, string>
+  }> = new Map();
+  private readonly CLIENT_CACHE_TTL = 5 * 60 * 1000; // five minutes caching time
 
   constructor(config: Config, logger: Logger, mcpClient: MCPClientManager) {
     this.config = config;
     this.logger = logger;
     this.mcpClient = mcpClient;
+    
+    EventEmitter.defaultMaxListeners = 15;
     
     this.accessToken = process.env.ACCESS_TOKEN || '';
     if (!this.accessToken) {
@@ -31,6 +40,8 @@ export class HttpServer {
     this.setupRoutes();
 
     this.setupHeartbeat();
+
+    setInterval(() => this.cleanupClientCache(), this.CLIENT_CACHE_TTL);
   }
 
   private setupHeartbeat() {
@@ -85,6 +96,18 @@ export class HttpServer {
     });
   }
 
+  private maskSensitiveData(data: any): any {
+    if (!data) return data;
+    const masked = { ...data };
+    if (masked.env && typeof masked.env === 'object') {
+      masked.env = Object.keys(masked.env).reduce((acc, key) => {
+        acc[key] = '********';
+        return acc;
+      }, {} as Record<string, string>);
+    }
+    return masked;
+  }
+
   private setupRoutes(): void {
     // Health check endpoint
     this.app.get('/health', (req: Request, res: Response) => {
@@ -96,8 +119,8 @@ export class HttpServer {
       let clientId: string | undefined;
       try {
         const { serverPath, method, params, args, env } = req.body;
-
-        this.logger.info('Bridge request received:', req.body);
+        
+        this.logger.info('Bridge request received:', this.maskSensitiveData(req.body));
         if (!serverPath || !method || !params) {
           res.status(400).json({ 
             error: 'Invalid request body. Required: serverPath, method, params. Optional: args' 
@@ -105,21 +128,47 @@ export class HttpServer {
           return;
         }
 
-        // Create a new client for this request with optional args
-        clientId = await this.mcpClient.createClient(serverPath, args, env);
+        // Generate cache key
+        const cacheKey = `${serverPath}-${JSON.stringify(args)}-${JSON.stringify(env)}`;
+        const cachedClient = this.clientCache.get(cacheKey);
 
-        // Execute the request
+        if (cachedClient) {
+          try {
+            // Test if the connection is still valid
+            await this.mcpClient.executeRequest(cachedClient.id, 'ping', {});
+            clientId = cachedClient.id;
+            cachedClient.lastUsed = Date.now();
+            this.logger.debug(`Using cached client: ${clientId}`);
+          } catch (error) {
+            // If the connection is invalid, delete the cache and create a new one
+            this.logger.warn(`Cached client ${cachedClient.id} is invalid, creating new one`);
+            await this.mcpClient.closeClient(cachedClient.id).catch(() => {});
+            this.clientCache.delete(cacheKey);
+            clientId = await this.mcpClient.createClient(serverPath, args, env);
+            this.clientCache.set(cacheKey, {
+              id: clientId,
+              lastUsed: Date.now(),
+              env
+            });
+          }
+        } else {
+          // Create new client
+          clientId = await this.mcpClient.createClient(serverPath, args, env);
+          this.clientCache.set(cacheKey, {
+            id: clientId,
+            lastUsed: Date.now(),
+            env
+          });
+          this.logger.info(`Created new client: ${clientId}`);
+        }
+
+        // Execute request
         const response = await this.mcpClient.executeRequest(clientId, method, params);
         res.json(response);
 
       } catch (error) {
         this.logger.error('Error processing bridge request:', error);
         res.status(500).json({ error: 'Failed to process request' });
-      } finally {
-        // Clean up the specific client after use
-        if (clientId) {
-          await this.mcpClient.closeClient(clientId);
-        }
       }
     });
   }
@@ -159,8 +208,43 @@ export class HttpServer {
   }
 
   public async stop(): Promise<void> {
+    if (this.reconnectTimer) {
+      clearInterval(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+
+    // Close all cached clients
+    const closePromises = Array.from(this.clientCache.values()).map(async (client) => {
+      try {
+        await this.mcpClient.closeClient(client.id);
+      } catch (error) {
+        this.logger.error(`Error closing client ${client.id}:`, error);
+      }
+    });
+
+    await Promise.all(closePromises);
+    this.clientCache.clear();
+    
     if (this.tunnelManager) {
       await this.tunnelManager.disconnect();
+    }
+  }
+
+  private async cleanupClientCache(): Promise<void> {
+    const now = Date.now();
+    for (const [key, value] of this.clientCache.entries()) {
+      try {
+        if (now - value.lastUsed > this.CLIENT_CACHE_TTL) {
+          await this.mcpClient.closeClient(value.id).catch(err => {
+            this.logger.error(`Error closing client ${value.id}:`, err);
+          });
+          this.clientCache.delete(key);
+          this.logger.debug(`Cleaned up cached client: ${key}`);
+        }
+      } catch (error) {
+        this.logger.error(`Error during cleanup for client ${value.id}:`, error);
+        this.clientCache.delete(key);
+      }
     }
   }
 } 
