@@ -10,13 +10,13 @@
 
 The Model Context Protocol (MCP) introduced by Anthropic is cool. However, most MCP servers are built on Stdio transport, which, while excellent for accessing local resources, limits their use in cloud-based applications.
 
-MCP connect is a tiny tool that is created to solve this problem:
+MCP Connect is a tiny tool that is created to solve this problem:
 
 - **Cloud Integration**: Enables cloud-based AI services to interact with local Stdio based MCP servers
 - **Protocol Translation**: Converts HTTP/HTTPS requests to Stdio communication
 - **Security**: Provides secure access to local resources while maintaining control
 - **Flexibility**: Supports various MCP servers without modifying their implementation
-- **Easy to use**: Just run the bridge and the MCP server, zero modification to the MCP server
+- **Easy to use**: Just run MCP Connect locally, zero modification to the MCP server
 - **Tunnel**: Built-in support for Ngrok tunnel
 
 By bridging this gap, we can leverage the full potential of local MCP tools in cloud-based AI applications without compromising on security.
@@ -40,11 +40,11 @@ By bridging this gap, we can leverage the full potential of local MCP tools in c
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/modelcontextprotocol/mcp-bridge.git
+   git clone https://github.com/modelcontextprotocol/mcp-connect.git
    ```
    and enter the directory
    ```bash
-   cd mcp-bridge
+   cd mcp-connect
    ```
 2. Copy `.env.example` to `.env` and configure the port and auth_token:
    ```bash
@@ -54,11 +54,11 @@ By bridging this gap, we can leverage the full potential of local MCP tools in c
    ```bash
    npm install
    ```
-4. Run the bridge
+4. Run MCP Connect
    ```bash
-   # build the bridge
+   # build MCP Connect
    npm run build
-   # run the bridge
+   # run MCP Connect
    npm run start
    # or, run in dev mode (supports hot reloading by nodemon)
    npm run dev
@@ -71,7 +71,7 @@ Note:
 
 ## Running with Ngrok Tunnel
 
-MCP connect has built-in support for Ngrok tunnel. To run the bridge with a public URL using Ngrok:
+MCP Connect has built-in support for Ngrok tunnel. To run the bridge with a public URL using Ngrok:
 
 1. Get your Ngrok auth token from https://dashboard.ngrok.com/authtokens
 2. Add to your .env file:
@@ -86,11 +86,11 @@ MCP connect has built-in support for Ngrok tunnel. To run the bridge with a publ
    # Development mode with tunnel
    npm run dev:tunnel
    ``` 
-After the bridge is running, you can see the MCP connect URL in the console.
+After MCP Connect is running, you can see the MCP bridge URL in the console.
 
 ## API Endpoints
 
-After the bridge is running, there are two endpoints exposed:
+After MCP Connect is running, there are two endpoints exposed:
 
 - `GET /health`: Health check endpoint
 - `POST /bridge`: Main bridge endpoint for receiving requests from the cloud
@@ -157,7 +157,7 @@ curl -X POST http://localhost:3000/bridge \
 
 ## Authentication
 
-The bridge uses a simple token-based authentication system. The token is stored in the `.env` file. If the token is set, the bridge will use it to authenticate the request.
+MCP Connect uses a simple token-based authentication system. The token is stored in the `.env` file. If the token is set, MCP Connect will use it to authenticate the request.
 
 Sample request with token:
 
