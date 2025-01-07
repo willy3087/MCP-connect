@@ -187,6 +187,12 @@ Required environment variables:
 - `LOG_LEVEL`: Logging level (default: info, required)
 - `NGROK_AUTH_TOKEN`: Ngrok auth token (Optional)
 
+## Demo demo
+
+The following is a demo of using MCP Bridge to access a local MCP Server on [ConsoleX AI](https://consolex.ai):
+
+![MCP Bridge Demo](https://github.com/user-attachments/assets/19dec583-7911-4221-bd87-3e6032ea7732)
+
 ## License
 
 MIT License
