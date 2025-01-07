@@ -45,12 +45,18 @@ export class HttpServer {
   }
 
   private setupHeartbeat() {
-    this.reconnectTimer = setInterval(() => {
-      fetch(`http://localhost:${this.config.server.port}/health`)
-        .catch(error => {
-          this.logger.warn('Health check failed, restarting server...');
-          this.start();
+    this.reconnectTimer = setInterval(async () => {
+      try {
+        const response = await fetch(`http://localhost:${this.config.server.port}/health`);
+        if (!response.ok) {
+          throw new Error(`Health check failed with status: ${response.status}`);
+        }
+      } catch (error) {
+        this.logger.warn('Health check failed, restarting server...', error);
+        await this.start().catch(startError => {
+          this.logger.error('Failed to restart server:', startError);
         });
+      }
     }, 30000); 
   }
 
