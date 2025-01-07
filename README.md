@@ -1,4 +1,4 @@
-# MCP Bridge
+# MCP connect
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
     ███╗   ███╗ ██████╗██████╗     ██████╗ ██████╗ ██║██████╗  ██████╗ ███████╗
@@ -10,7 +10,7 @@
 
 The Model Context Protocol (MCP) introduced by Anthropic is cool. However, most MCP servers are built on Stdio transport, which, while excellent for accessing local resources, limits their use in cloud-based applications.
 
-MCP bridge is a tiny tool that is created to solve this problem:
+MCP connect is a tiny tool that is created to solve this problem:
 
 - **Cloud Integration**: Enables cloud-based AI services to interact with local Stdio based MCP servers
 - **Protocol Translation**: Converts HTTP/HTTPS requests to Stdio communication
@@ -63,7 +63,7 @@ By bridging this gap, we can leverage the full potential of local MCP tools in c
    # or, run in dev mode (supports hot reloading by nodemon)
    npm run dev
    ```
-Now MCP bridge should be running on `http://localhost:3000/bridge`.
+Now MCP connect should be running on `http://localhost:3000/bridge`.
 
 Note:
 - The bridge is designed to be run on a local machine, so you still need to build a tunnel to the local MCP server that is accessible from the cloud.
@@ -71,7 +71,7 @@ Note:
 
 ## Running with Ngrok Tunnel
 
-MCP bridge has built-in support for Ngrok tunnel. To run the bridge with a public URL using Ngrok:
+MCP connect has built-in support for Ngrok tunnel. To run the bridge with a public URL using Ngrok:
 
 1. Get your Ngrok auth token from https://dashboard.ngrok.com/authtokens
 2. Add to your .env file:
@@ -86,7 +86,7 @@ MCP bridge has built-in support for Ngrok tunnel. To run the bridge with a publi
    # Development mode with tunnel
    npm run dev:tunnel
    ``` 
-After the bridge is running, you can see the MCP Bridge URL in the console.
+After the bridge is running, you can see the MCP connect URL in the console.
 
 ## API Endpoints
 
@@ -187,11 +187,11 @@ Required environment variables:
 - `LOG_LEVEL`: Logging level (default: info, required)
 - `NGROK_AUTH_TOKEN`: Ngrok auth token (Optional)
 
-## Using MCP Bridge with ConsoleX AI to access local MCP Server
+## Using MCP Connect with ConsoleX AI to access local MCP Server
 
-The following is a demo of using MCP Bridge to access a local MCP Server on [ConsoleX AI](https://consolex.ai):
+The following is a demo of using MCP Connect to access a local MCP Server on [ConsoleX AI](https://consolex.ai):
 
-[![MCP Bridge Live Demo](readme/thumbnail.png)](https://github-production-user-asset-6210df.s3.amazonaws.com/6077178/400736575-19dec583-7911-4221-bd87-3e6032ea7732.mp4)
+[![MCP Connect Live Demo](readme/thumbnail.png)](https://github-production-user-asset-6210df.s3.amazonaws.com/6077178/400736575-19dec583-7911-4221-bd87-3e6032ea7732.mp4)
 
 ## License
 
