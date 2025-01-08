@@ -45,12 +45,18 @@ export class HttpServer {
   }
 
   private setupHeartbeat() {
-    this.reconnectTimer = setInterval(() => {
-      fetch(`http://localhost:${this.config.server.port}/health`)
-        .catch(error => {
-          this.logger.warn('Health check failed, restarting server...');
-          this.start();
+    this.reconnectTimer = setInterval(async () => {
+      try {
+        const response = await fetch(`http://localhost:${this.config.server.port}/health`);
+        if (!response.ok) {
+          throw new Error(`Health check failed with status: ${response.status}`);
+        }
+      } catch (error) {
+        this.logger.warn('Health check failed, restarting server...', error);
+        await this.start().catch(startError => {
+          this.logger.error('Failed to restart server:', startError);
         });
+      }
     }, 30000); 
   }
 
@@ -183,25 +189,44 @@ export class HttpServer {
     ╚═╝     ╚═╝ ╚═════╝╚═╝          ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═╝   
     `;
     
-    this.app.listen(this.config.server.port, async () => {
-      console.log('\x1b[36m%s\x1b[0m', banner);
-      const localUrl = `http://localhost:${this.config.server.port}`;
-      this.logger.info(`Server listening on port ${this.config.server.port}`);
-      this.logger.info(`Local: ${localUrl}`);
-      this.logger.info(`Health check URL: ${localUrl}/health`);
-      this.logger.info(`MCP Bridge URL: ${localUrl}/bridge`);
+    return new Promise((resolve, reject) => {
+      try {
+        const server = this.app.listen(this.config.server.port, async () => {
+          try {
+            console.log('\x1b[36m%s\x1b[0m', banner);
+            const localUrl = `http://localhost:${this.config.server.port}`;
+            this.logger.info(`Server listening on port ${this.config.server.port}`);
+            this.logger.info(`Local: ${localUrl}`);
+            this.logger.info(`Health check URL: ${localUrl}/health`);
+            this.logger.info(`MCP Bridge URL: ${localUrl}/bridge`);
 
-      if (this.tunnelManager) {
-        this.tunnelManager.createTunnel(this.config.server.port)
-          .then(url => {
-            if (url) {
-              this.logger.info(`Tunnel URL: ${url}`);
-              this.logger.info(`MCP Bridge URL: ${url}/bridge`);
+            if (this.tunnelManager) {
+              try {
+                const url = await this.tunnelManager.createTunnel(this.config.server.port);
+                if (url) {
+                  this.logger.info(`Tunnel URL: ${url}`);
+                  this.logger.info(`MCP Bridge URL: ${url}/bridge`);
+                }
+              } catch (error) {
+                this.logger.error('Failed to create tunnel:', error);
+                // Don't reject here as tunnel is optional
+              }
             }
-          })
-          .catch(error => {
-            this.logger.error('Failed to create tunnel:', error);
-          });
+            resolve();
+          } catch (error) {
+            this.logger.error('Error during server startup:', error);
+            server.close();
+            reject(error);
+          }
+        });
+
+        server.on('error', (error: Error) => {
+          this.logger.error('Server failed to start:', error);
+          reject(error);
+        });
+      } catch (error) {
+        this.logger.error('Critical error during server initialization:', error);
+        reject(error);
       }
     });
   }
@@ -246,4 +271,4 @@ export class HttpServer {
       }
     }
   }
-} 
+}
