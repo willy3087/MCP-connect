@@ -64,6 +64,11 @@ export class HttpServer {
     // JSON body parser
     this.app.use(express.json());
 
+    // Health check endpoint
+    this.app.get('/health', (req: Request, res: Response) => {
+      res.json({ status: 'ok' });
+    });
+
     // Bearer Token Authentication middleware
     this.app.use((req: Request, res: Response, next) => {
       const authHeader = req.headers.authorization;
@@ -94,7 +99,6 @@ export class HttpServer {
       next();
     });
 
-
     // Error handling middleware
     this.app.use((err: Error, req: Request, res: Response, next: any) => {
       this.logger.error('Server error:', err);
@@ -115,11 +119,6 @@ export class HttpServer {
   }
 
   private setupRoutes(): void {
-    // Health check endpoint
-    this.app.get('/health', (req: Request, res: Response) => {
-      res.json({ status: 'ok' });
-    });
-
     // Bridge endpoint
     this.app.post('/bridge', async (req: Request, res: Response) => {
       let clientId: string | undefined;
