@@ -1,118 +1,119 @@
 # MCP Connect
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+[![Licença: MIT](https://img.shields.io/badge/Licença-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
     ███╗   ███╗ ██████╗██████╗      ██████╗ ██████╗ ███╗   ██╗███╗   ██╗███████╗ ██████╗████████╗
     ████╗ ████║██╔════╝██╔══██╗    ██╔════╝██╔═══██╗████╗  ██║████╗  ██║██╔════╝██╔════╝╚══██╔══╝
-    ██╔████╔██║██║     ██████╔╝    ██║     ██║   ██║██╔██╗ ██║██╔██╗ ██║█████╗  ██║        ██║   
-    ██║╚██╔╝██║██║     ██╔═══╝     ██║     ██║   ██║██║╚██╗██║██║╚██╗██║██╔══╝  ██║        ██║   
-    ██║ ╚═╝ ██║╚██████╗██║         ╚██████╗╚██████╔╝██║ ╚████║██║ ╚████║███████╗╚██████╗   ██║   
-    ╚═╝     ╚═╝ ╚═════╝╚═╝          ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═╝   
+    ██╔████╔██║██║     ██████╔╝    ██║     ██║   ██║██╔██╗ ██║██╔██╗ ██║█████╗  ██║        ██║
+    ██║╚██╔╝██║██║     ██╔═══╝     ██║     ██║   ██║██║╚██╗██║██║╚██╗██║██╔══╝  ██║        ██║
+    ██║ ╚═╝ ██║╚██████╗██║         ╚██████╗╚██████╔╝██║ ╚████║██║ ╚████║███████╗╚██████╗   ██║
+    ╚═╝     ╚═╝ ╚═════╝╚═╝          ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═╝
 
-The Model Context Protocol (MCP) introduced by Anthropic is cool. However, most MCP servers are built on Stdio transport, which, while excellent for accessing local resources, limits their use in cloud-based applications.
+O Model Context Protocol (MCP) introduzido pela Anthropic é interessante. No entanto, a maioria dos servidores MCP são construídos em transporte Stdio, que, embora excelente para acessar recursos locais, limita seu uso em aplicações baseadas em nuvem.
 
-MCP Connect is a tiny tool that is created to solve this problem:
+O MCP Connect é uma pequena ferramenta criada para resolver este problema:
 
-- **Cloud Integration**: Enables cloud-based AI services to interact with local Stdio based MCP servers
-- **Protocol Translation**: Converts HTTP/HTTPS requests to Stdio communication
-- **Security**: Provides secure access to local resources while maintaining control
-- **Flexibility**: Supports various MCP servers without modifying their implementation
-- **Easy to use**: Just run MCP Connect locally, zero modification to the MCP server
-- **Tunnel**: Built-in support for Ngrok tunnel
+- **Integração com Nuvem**: Permite que serviços de IA baseados em nuvem interajam com servidores MCP locais baseados em Stdio
+- **Tradução de Protocolo**: Converte requisições HTTP/HTTPS em comunicação Stdio
+- **Segurança**: Fornece acesso seguro a recursos locais mantendo o controle
+- **Flexibilidade**: Suporta vários servidores MCP sem modificar sua implementação
+- **Fácil de usar**: Basta executar o MCP Connect localmente, sem necessidade de modificar o servidor MCP
+- **Túnel**: Suporte integrado para túnel Ngrok
 
-By bridging this gap, we can leverage the full potential of local MCP tools in cloud-based AI applications without compromising on security.
+Ao preencher esta lacuna, podemos aproveitar todo o potencial das ferramentas MCP locais em aplicações de IA baseadas em nuvem sem comprometer a segurança.
 
-## How it works
+## Como funciona
 
 ```
 +-----------------+     HTTPS/SSE      +------------------+      stdio      +------------------+
 |                 |                    |                  |                 |                  |
-|  Cloud AI tools | <--------------->  |  Node.js Bridge  | <------------>  |    MCP Server    |
-|   (Remote)      |       Tunnels      |    (Local)       |                 |     (Local)      |
+|  Ferramentas IA | <--------------->  |  Ponte Node.js   | <------------>  |    Servidor MCP  |
+|   (Remoto)      |       Túneis       |    (Local)       |                 |     (Local)      |
 |                 |                    |                  |                 |                  |
 +-----------------+                    +------------------+                 +------------------+
 ```
 
-## Prerequisites
+## Pré-requisitos
 
 - Node.js
 
-## Quick Start
+## Início Rápido
 
-1. Clone the repository
+1. Clone o repositório
    ```bash
    git clone https://github.com/EvalsOne/MCP-connect.git
    ```
-   and enter the directory
+   e entre no diretório
    ```bash
    cd MCP-connect
    ```
-2. Copy `.env.example` to `.env` and configure the port and auth_token:
+2. Copie `.env.example` para `.env` e configure a porta e o token de autenticação:
    ```bash
    cp .env.example .env
    ```
-3. Install dependencies:
+3. Instale as dependências:
    ```bash
    npm install
    ```
-4. Run MCP Connect
+4. Execute o MCP Connect
    ```bash
-   # build MCP Connect
+   # construa o MCP Connect
    npm run build
-   # run MCP Connect
+   # execute o MCP Connect
    npm run start
-   # or, run in dev mode (supports hot reloading by nodemon)
+   # ou, execute em modo de desenvolvimento (suporta recarregamento automático via nodemon)
    npm run dev
    ```
-Now MCP connect should be running on `http://localhost:3000/bridge`.
+   Agora o MCP Connect deve estar rodando em `http://localhost:3000/bridge`.
 
-Note:
-- The bridge is designed to be run on a local machine, so you still need to build a tunnel to the local MCP server that is accessible from the cloud.
-- Ngrok, Cloudflare Zero Trust, and LocalTunnel are recommended for building the tunnel.
+Observação:
 
-## Running with Ngrok Tunnel
+- A ponte é projetada para ser executada em uma máquina local, então você ainda precisa construir um túnel para o servidor MCP local que seja acessível da nuvem.
+- Ngrok, Cloudflare Zero Trust e LocalTunnel são recomendados para construir o túnel.
 
-MCP Connect has built-in support for Ngrok tunnel. To run the bridge with a public URL using Ngrok:
+## Executando com Túnel Ngrok
 
-1. Get your Ngrok auth token from https://dashboard.ngrok.com/authtokens
-2. Add to your .env file:
+O MCP Connect tem suporte integrado para túnel Ngrok. Para executar a ponte com uma URL pública usando Ngrok:
+
+1. Obtenha seu token de autenticação Ngrok em https://dashboard.ngrok.com/authtokens
+2. Adicione ao seu arquivo .env:
    ```
-   NGROK_AUTH_TOKEN=your_ngrok_auth_token
+   NGROK_AUTH_TOKEN=seu_token_ngrok
    ```
-3. Run with tunnel:
+3. Execute com túnel:
+
    ```bash
-   # Production mode with tunnel
+   # Modo de produção com túnel
    npm run start:tunnel
-   
-   # Development mode with tunnel
+
+   # Modo de desenvolvimento com túnel
    npm run dev:tunnel
-   ``` 
-After MCP Connect is running, you can see the MCP bridge URL in the console.
+   ```
 
-## API Endpoints
+   Após o MCP Connect estar em execução, você pode ver a URL da ponte MCP no console.
 
-After MCP Connect is running, there are two endpoints exposed:
+## Endpoints da API
 
-- `GET /health`: Health check endpoint
-- `POST /bridge`: Main bridge endpoint for receiving requests from the cloud
+Após o MCP Connect estar em execução, existem dois endpoints expostos:
 
-For example, the following is a configuration of the official [GitHub MCP](https://github.com/modelcontextprotocol/servers/tree/main/src/github):
+- `GET /health`: Endpoint de verificação de saúde
+- `POST /bridge`: Endpoint principal da ponte para receber requisições da nuvem
+
+Por exemplo, a seguir está uma configuração do [MCP GitHub oficial](https://github.com/modelcontextprotocol/servers/tree/main/src/github):
 
 ```json
 {
   "command": "npx",
-  "args": [
-    "-y",
-    "@modelcontextprotocol/server-github"
-  ],
+  "args": ["-y", "@modelcontextprotocol/server-github"],
   "env": {
-    "GITHUB_PERSONAL_ACCESS_TOKEN": "<your_github_personal_access_token>"
+    "GITHUB_PERSONAL_ACCESS_TOKEN": "<seu_token_de_acesso_pessoal_github>"
   }
 }
 ```
 
-You can send a request to the bridge as the following to list the tools of the MCP server and call a specific tool.
+Você pode enviar uma requisição para a ponte da seguinte forma para listar as ferramentas do servidor MCP e chamar uma ferramenta específica.
 
-**Listing tools:**
+**Listando ferramentas:**
 
 ```bash
 curl -X POST http://localhost:3000/bridge \
@@ -125,14 +126,14 @@ curl -X POST http://localhost:3000/bridge \
        ],
        "params": {},
        "env": {
-         "GITHUB_PERSONAL_ACCESS_TOKEN": "<your_github_personal_access_token>"
+         "GITHUB_PERSONAL_ACCESS_TOKEN": "<seu_token_de_acesso_pessoal_github>"
        }
      }'
 ```
 
-**Calling a tool:**
+**Chamando uma ferramenta:**
 
-Using the search_repositories tool to search for repositories related to modelcontextprotocol
+Usando a ferramenta search_repositories para procurar repositórios relacionados ao modelcontextprotocol
 
 ```bash
 curl -X POST http://localhost:3000/bridge \
@@ -150,20 +151,20 @@ curl -X POST http://localhost:3000/bridge \
          },
        },
        "env": {
-         "GITHUB_PERSONAL_ACCESS_TOKEN": "<your_github_personal_access_token>"
+         "GITHUB_PERSONAL_ACCESS_TOKEN": "<seu_token_de_acesso_pessoal_github>"
        }
      }'
 ```
 
-## Authentication
+## Autenticação
 
-MCP Connect uses a simple token-based authentication system. The token is stored in the `.env` file. If the token is set, MCP Connect will use it to authenticate the request.
+O MCP Connect usa um sistema simples de autenticação baseado em token. O token é armazenado no arquivo `.env`. Se o token estiver definido, o MCP Connect o usará para autenticar a requisição.
 
-Sample request with token:
+Exemplo de requisição com token:
 
 ```bash
 curl -X POST http://localhost:3000/bridge \
-     -H "Authorization: Bearer <your_auth_token>" \
+     -H "Authorization: Bearer <seu_token>" \
      -d '{
        "method": "tools/list",
        "serverPath": "npx",
@@ -173,26 +174,26 @@ curl -X POST http://localhost:3000/bridge \
        ],
        "params": {},
        "env": {
-         "GITHUB_PERSONAL_ACCESS_TOKEN": "<your_github_personal_access_token>"
+         "GITHUB_PERSONAL_ACCESS_TOKEN": "<seu_token_de_acesso_pessoal_github>"
        }
      }'
 ```
 
-## Configuration
+## Configuração
 
-Required environment variables:
+Variáveis de ambiente necessárias:
 
-- `AUTH_TOKEN`: Authentication token for the bridge API (Optional)
-- `PORT`: HTTP server port (default: 3000, required)
-- `LOG_LEVEL`: Logging level (default: info, required)
-- `NGROK_AUTH_TOKEN`: Ngrok auth token (Optional)
+- `AUTH_TOKEN`: Token de autenticação para a API da ponte (Opcional)
+- `PORT`: Porta do servidor HTTP (padrão: 3000, obrigatório)
+- `LOG_LEVEL`: Nível de log (padrão: info, obrigatório)
+- `NGROK_AUTH_TOKEN`: Token de autenticação Ngrok (Opcional)
 
-## Using MCP Connect with ConsoleX AI to access local MCP Server
+## Usando o MCP Connect com ConsoleX AI para acessar o Servidor MCP Local
 
-The following is a demo of using MCP Connect to access a local MCP Server on [ConsoleX AI](https://consolex.ai):
+A seguir está uma demonstração do uso do MCP Connect para acessar um Servidor MCP local no [ConsoleX AI](https://consolex.ai):
 
-[![MCP Connect Live Demo](readme/thumbnail.png)](https://github-production-user-asset-6210df.s3.amazonaws.com/6077178/400736575-19dec583-7911-4221-bd87-3e6032ea7732.mp4)
+[![Demonstração ao Vivo do MCP Connect](readme/thumbnail.png)](https://github-production-user-asset-6210df.s3.amazonaws.com/6077178/400736575-19dec583-7911-4221-bd87-3e6032ea7732.mp4)
 
-## License
+## Licença
 
-MIT License
+Licença MIT
