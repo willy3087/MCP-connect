@@ -40,22 +40,31 @@ Ao preencher esta lacuna, podemos aproveitar todo o potencial das ferramentas MC
 ## Início Rápido
 
 1. Clone o repositório
+
    ```bash
    git clone https://github.com/EvalsOne/MCP-connect.git
    ```
+
    e entre no diretório
+
    ```bash
    cd MCP-connect
    ```
+
 2. Copie `.env.example` para `.env` e configure a porta e o token de autenticação:
+
    ```bash
    cp .env.example .env
    ```
+
 3. Instale as dependências:
+
    ```bash
    npm install
    ```
+
 4. Execute o MCP Connect
+
    ```bash
    # construa o MCP Connect
    npm run build
@@ -64,6 +73,7 @@ Ao preencher esta lacuna, podemos aproveitar todo o potencial das ferramentas MC
    # ou, execute em modo de desenvolvimento (suporta recarregamento automático via nodemon)
    npm run dev
    ```
+
    Agora o MCP Connect deve estar rodando em `http://localhost:3000/bridge`.
 
 Observação:
@@ -77,9 +87,11 @@ O MCP Connect tem suporte integrado para túnel Ngrok. Para executar a ponte com
 
 1. Obtenha seu token de autenticação Ngrok em https://dashboard.ngrok.com/authtokens
 2. Adicione ao seu arquivo .env:
+
    ```
    NGROK_AUTH_TOKEN=seu_token_ngrok
    ```
+
 3. Execute com túnel:
 
    ```bash
@@ -116,7 +128,7 @@ Você pode enviar uma requisição para a ponte da seguinte forma para listar as
 **Listando ferramentas:**
 
 ```bash
-curl -X POST http://localhost:3000/bridge \
+curl -X POST http://localhost:3004/bridge \
      -d '{
        "method": "tools/list",
        "serverPath": "npx",
@@ -136,7 +148,7 @@ curl -X POST http://localhost:3000/bridge \
 Usando a ferramenta search_repositories para procurar repositórios relacionados ao modelcontextprotocol
 
 ```bash
-curl -X POST http://localhost:3000/bridge \
+curl -X POST http://localhost:3004/bridge \
      -d '{
        "method": "tools/call",
        "serverPath": "npx",
@@ -163,7 +175,7 @@ O MCP Connect usa um sistema simples de autenticação baseado em token. O token
 Exemplo de requisição com token:
 
 ```bash
-curl -X POST http://localhost:3000/bridge \
+curl -X POST http://localhost:3004/bridge \
      -H "Authorization: Bearer <seu_token>" \
      -d '{
        "method": "tools/list",
@@ -184,7 +196,7 @@ curl -X POST http://localhost:3000/bridge \
 Variáveis de ambiente necessárias:
 
 - `AUTH_TOKEN`: Token de autenticação para a API da ponte (Opcional)
-- `PORT`: Porta do servidor HTTP (padrão: 3000, obrigatório)
+- `PORT`: Porta do servidor HTTP (padrão: 3004, obrigatório)
 - `LOG_LEVEL`: Nível de log (padrão: info, obrigatório)
 - `NGROK_AUTH_TOKEN`: Token de autenticação Ngrok (Opcional)
 
